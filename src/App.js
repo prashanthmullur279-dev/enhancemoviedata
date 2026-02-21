@@ -90,6 +90,7 @@ const MovieCard = ({movie, onViewDetails, animDelay = 0}) => {
         <button
           className="view-details-btn"
           onClick={() => onViewDetails(movie.id)}
+          type="button"
         >
           View Details
         </button>
@@ -110,6 +111,7 @@ const Pagination = ({currentPage, totalPages, onPageChange}) => {
         className="pg-btn"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
+        type="button"
       >
         Prev
       </button>
@@ -121,6 +123,7 @@ const Pagination = ({currentPage, totalPages, onPageChange}) => {
         className="pg-btn"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === capped}
+        type="button"
       >
         Next
       </button>
@@ -329,7 +332,7 @@ const MovieDetailsPage = ({movieId, onBack}) => {
 
   return (
     <div className="page">
-      <button className="back-btn" onClick={onBack}>
+      <button className="back-btn" onClick={onBack} type="button">
         ← Back
       </button>
 
@@ -442,6 +445,7 @@ const Navbar = ({activeRoute, onNavigate, onSearch}) => {
                 activeRoute === route ? 'nav-btn-active' : ''
               }`}
               onClick={() => onNavigate(route)}
+              type="button"
             >
               {label}
             </button>
@@ -457,7 +461,7 @@ const Navbar = ({activeRoute, onNavigate, onSearch}) => {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
           />
-          <button className="search-btn" onClick={handleSearch}>
+          <button className="search-btn" onClick={handleSearch} type="button">
             Search
           </button>
         </div>

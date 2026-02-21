@@ -148,7 +148,9 @@ button {
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  transition: color var(--transition), border-color var(--transition),
+  transition:
+    color var(--transition),
+    border-color var(--transition),
     background var(--transition);
 }
 .nav-btn:hover {
@@ -179,7 +181,9 @@ button {
   font-size: 14px;
   font-family: inherit;
   width: 220px;
-  transition: border-color var(--transition), box-shadow var(--transition),
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
     width var(--transition);
   outline: none;
 }
@@ -202,7 +206,9 @@ button {
   font-weight: 500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  transition: background var(--transition), transform var(--transition),
+  transition:
+    background var(--transition),
+    transform var(--transition),
     box-shadow var(--transition);
 }
 .search-btn:hover {
@@ -256,7 +262,9 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition), box-shadow var(--transition),
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
     border-color var(--transition);
   animation: cardIn 0.45s ease both;
 }
@@ -339,7 +347,9 @@ button {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   margin-top: auto;
-  transition: background var(--transition), color var(--transition),
+  transition:
+    background var(--transition),
+    color var(--transition),
     border-color var(--transition);
 }
 .view-details-btn:hover {
@@ -367,7 +377,9 @@ button {
   border-radius: var(--radius);
   font-size: 13px;
   font-family: 'DM Mono', monospace;
-  transition: background var(--transition), color var(--transition),
+  transition:
+    background var(--transition),
+    color var(--transition),
     border-color var(--transition);
   padding: 0 8px;
 }
@@ -488,7 +500,9 @@ button {
   align-items: center;
   gap: 6px;
   margin-bottom: 32px;
-  transition: color var(--transition), border-color var(--transition),
+  transition:
+    color var(--transition),
+    border-color var(--transition),
     background var(--transition);
 }
 .back-btn:hover {
@@ -622,7 +636,9 @@ button {
   border-radius: 10px;
   overflow: hidden;
   text-align: center;
-  transition: transform var(--transition), border-color var(--transition);
+  transition:
+    transform var(--transition),
+    border-color var(--transition);
   animation: cardIn 0.4s ease both;
 }
 .cast-card:hover {
