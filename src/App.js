@@ -249,7 +249,9 @@ const SearchPage = ({searchQuery, onViewDetails}) => {
         Pagination also always rendered below.
       */}
       <h1 className="page-title">Searched</h1>
-      <p className="page-subtitle">Showing results for &quot;{searchQuery}&quot;</p>
+      <p className="page-subtitle">
+        Showing results for &quot;{searchQuery}&quot;
+      </p>
 
       {loading && <Loader />}
       {!loading && error && <ErrorState message={error} />}
