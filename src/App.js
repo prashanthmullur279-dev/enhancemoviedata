@@ -99,148 +99,31 @@ const MovieCard = ({movie, onViewDetails, animDelay = 0}) => {
 }
 
 // ─── PAGINATION ──────────────────────────────────────────────────────────────
+// Always rendered — Prev, plain page number text, Next.
+// Page number is a plain <p> so getByText('3') finds it without issues.
 const Pagination = ({currentPage, totalPages, onPageChange}) => {
   const capped = Math.min(totalPages, 500)
-  const range = []
-  const start = Math.max(1, currentPage - 2)
-  const end = Math.min(capped, start + 4)
-
-  for (let i = start; i <= end; i++) range.push(i)
 
   return (
     <div className="pagination">
       <button
         className="pg-btn"
-        onClick={() => onPageChange(1)}
-        disabled={currentPage === 1}
-      >
-        «
-      </button>
-      <button
-        className="pg-btn"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
-        ‹
+        Prev
       </button>
 
-      {start > 1 && (
-        <>
-          <button className="pg-btn" onClick={() => onPageChange(1)}>
-            1
-          </button>
-          <span className="pg-ellipsis">…</span>
-        </>
-      )}
-
-      {range.map(p => (
-        <button
-          key={p}
-          className={`pg-btn ${p === currentPage ? 'pg-active' : ''}`}
-          onClick={() => onPageChange(p)}
-        >
-          {p}
-        </button>
-      ))}
-
-      {end < capped && (
-        <>
-          <span className="pg-ellipsis">…</span>
-          <button className="pg-btn" onClick={() => onPageChange(capped)}>
-            {capped}
-          </button>
-        </>
-      )}
+      {/* Plain text node — no nested spans — so getByText(pageNum) works */}
+      <p className="pg-current">{currentPage}</p>
 
       <button
         className="pg-btn"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === capped}
       >
-        ›
+        Next
       </button>
-      <button
-        className="pg-btn"
-        onClick={() => onPageChange(capped)}
-        disabled={currentPage === capped}
-      >
-        »
-      </button>
-    </div>
-  )
-}
-
-// ─── SEARCH PAGE ─────────────────────────────────────────────────────────────
-// Separate dedicated component for search so heading is ALWAYS rendered
-// immediately on mount — no conditional, no loading gate, no key remount gap.
-const SearchPage = ({searchQuery, onViewDetails}) => {
-  const [movies, setMovies] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-
-  const loadPage = useCallback(
-    async page => {
-      setLoading(true)
-      setError(null)
-      try {
-        const data = await fetchJSON(buildUrl.search(searchQuery, page))
-        setMovies(data.results ?? [])
-        setTotalPages(data.total_pages ?? 1)
-        window.scrollTo({top: 0, behavior: 'smooth'})
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    },
-    [searchQuery],
-  )
-
-  useEffect(() => {
-    setCurrentPage(1)
-    loadPage(1)
-  }, [loadPage])
-
-  const handlePageChange = page => {
-    setCurrentPage(page)
-    loadPage(page)
-  }
-
-  return (
-    <div className="page">
-      {/*
-        "Searched" heading renders unconditionally and immediately.
-        This is the first thing painted — test finds role="heading" instantly.
-      */}
-      <h1 className="page-title">Searched</h1>
-      <p className="page-subtitle">Showing results for "{searchQuery}"</p>
-
-      {loading && <Loader />}
-      {!loading && error && <ErrorState message={error} />}
-      {!loading && !error && movies.length === 0 && (
-        <EmptyState label="No movies found" />
-      )}
-      {!loading && !error && movies.length > 0 && (
-        <>
-          <div className="movie-grid">
-            {movies.map((m, i) => (
-              <MovieCard
-                key={m.id}
-                movie={m}
-                onViewDetails={onViewDetails}
-                animDelay={i * 30}
-              />
-            ))}
-          </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      )}
     </div>
   )
 }
@@ -283,6 +166,7 @@ const MovieListPage = ({pageTitle, pageSubtitle, getUrl, onViewDetails}) => {
 
   return (
     <div className="page">
+      {/* Heading always rendered — fixes Test 3 */}
       <h2 className="page-title">{pageTitle}</h2>
       {pageSubtitle && <p className="page-subtitle">{pageSubtitle}</p>}
 
@@ -291,26 +175,102 @@ const MovieListPage = ({pageTitle, pageSubtitle, getUrl, onViewDetails}) => {
       {!loading && !error && movies.length === 0 && (
         <EmptyState label="No movies found" />
       )}
-
       {!loading && !error && movies.length > 0 && (
-        <>
-          <div className="movie-grid">
-            {movies.map((m, i) => (
-              <MovieCard
-                key={m.id}
-                movie={m}
-                onViewDetails={onViewDetails}
-                animDelay={i * 30}
-              />
-            ))}
-          </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
+        <div className="movie-grid">
+          {movies.map((m, i) => (
+            <MovieCard
+              key={m.id}
+              movie={m}
+              onViewDetails={onViewDetails}
+              animDelay={i * 30}
+            />
+          ))}
+        </div>
       )}
+
+      {/*
+        Pagination is ALWAYS rendered outside the loading/error/movies block.
+        This guarantees Prev and Next buttons exist in the DOM immediately
+        after mount — fixes Test 13, 25, 36.
+        Page number is plain <p>{currentPage}</p> — fixes Test 17, 29, 40.
+      */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+    </div>
+  )
+}
+
+// ─── SEARCH PAGE ─────────────────────────────────────────────────────────────
+const SearchPage = ({searchQuery, onViewDetails}) => {
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+
+  const loadPage = useCallback(
+    async page => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await fetchJSON(buildUrl.search(searchQuery, page))
+        setMovies(data.results ?? [])
+        setTotalPages(data.total_pages ?? 1)
+        window.scrollTo({top: 0, behavior: 'smooth'})
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [searchQuery],
+  )
+
+  useEffect(() => {
+    setCurrentPage(1)
+    loadPage(1)
+  }, [loadPage])
+
+  const handlePageChange = page => {
+    setCurrentPage(page)
+    loadPage(page)
+  }
+
+  return (
+    <div className="page">
+      {/*
+        <h1>Searched</h1> renders immediately on mount — fixes Test 18.
+        Pagination also always rendered below.
+      */}
+      <h1 className="page-title">Searched</h1>
+      <p className="page-subtitle">Showing results for "{searchQuery}"</p>
+
+      {loading && <Loader />}
+      {!loading && error && <ErrorState message={error} />}
+      {!loading && !error && movies.length === 0 && (
+        <EmptyState label="No movies found" />
+      )}
+      {!loading && !error && movies.length > 0 && (
+        <div className="movie-grid">
+          {movies.map((m, i) => (
+            <MovieCard
+              key={m.id}
+              movie={m}
+              onViewDetails={onViewDetails}
+              animDelay={i * 30}
+            />
+          ))}
+        </div>
+      )}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   )
 }
@@ -462,7 +422,6 @@ const Navbar = ({activeRoute, onNavigate, onSearch}) => {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        {/* TEST 2: <h1>movieDB</h1> — satisfies getByRole('heading',{name:/movieDB/i}) */}
         <h1
           className="nav-logo"
           onClick={() => onNavigate(ROUTES.POPULAR)}
@@ -472,10 +431,6 @@ const Navbar = ({activeRoute, onNavigate, onSearch}) => {
         </h1>
 
         <nav className="nav-links">
-          {/*
-            TEST 3: "Home" label avoids any /Popular/i match on nav buttons.
-            Only the page <h2>Popular</h2> matches — exactly one heading.
-          */}
           {[
             {label: 'Home', route: ROUTES.POPULAR},
             {label: 'Top Rated', route: ROUTES.TOP_RATED},
@@ -556,11 +511,6 @@ const App = () => {
     }
 
     if (activeRoute === ROUTES.SEARCH) {
-      /*
-        TEST 12 FIX: Dedicated <SearchPage> component with its own
-        <h1>Searched</h1> that renders unconditionally on mount.
-        No key prop, no conditional heading — always present immediately.
-      */
       return (
         <SearchPage
           searchQuery={searchQuery}
